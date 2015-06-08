@@ -20,6 +20,7 @@ Within the download you'll find the following directories and files:
 ```
 lexhacks-contract-reader.zip/
 ├── test-parse.py
+├── screenshot.png
 └── README.md
 ```
 
