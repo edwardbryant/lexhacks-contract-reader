@@ -11,7 +11,7 @@ The original version of this project was completed for [LexHacks 2015](http://ww
 
 ## Download
 
-The files for the project, may be [downloaded here](https://github.com/edwardbryant/time-travel-trivia-quiz/archive/master.zip).
+The files for the project, may be [downloaded here](https://github.com/edwardbryant/lexhacks-contract-reader/archive/master.zip).
 
 ### What's included
 
