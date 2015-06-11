@@ -20,10 +20,16 @@ def parseSamples(path, limit):
                     k = contract.Contract(dirpath, filename, text)
 
                     k.output_filename_header(num)
-                    k.tokenize()
                     k.output_basic_stats()
+                    
+                    # output set of tokens which includes 5 tokens before 
+                    # and after the first occurrence of the token "agreement" 
+                    # print k.get_token_in_context(k.find_token('agreement'), 8)
+
+                    # k.test()
+
 
     print ".......................... END ..........................."
     print " "
 
-parseSamples('../contract-data/2014/QTR1/20140102', 170)
+parseSamples('../contract-data/2014/QTR1', 20)
