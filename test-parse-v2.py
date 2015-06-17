@@ -18,9 +18,12 @@ def parseSamples(path, limit):
                 text = f.read()
                 if num < limit:
                     k = contract.Contract(dirpath, filename, text)
-
                     k.output_filename_header(num)
                     k.output_basic_stats()
+
+                    k.extract_parties()
+                    k.output_parties()
+                    print " \n "
                     
                     # output set of tokens which includes 5 tokens before 
                     # and after the first occurrence of the token "agreement" 
