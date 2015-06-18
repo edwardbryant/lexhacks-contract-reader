@@ -33,7 +33,7 @@ lexhacks-contract-reader.zip/
 
 ## Documentation
 
-Documentation for using test-parse-v2 is coming soon.
+Documentation for using the new Python class version (contracts.py) is coming soon.
 
 If you can't wait, the class methods are already commented (see contracts.py file) that explain most of what you would need to use it. In addition, test-parse-v2.py is an example use of the class to parse some contract files.  
 
