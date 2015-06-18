@@ -35,16 +35,16 @@ lexhacks-contract-reader.zip/
 
 Documentation for using the new Python class version (contracts.py) is coming soon.
 
-If you can't wait, the class methods are already commented (see contracts.py file) that explain most of what you would need to use it. In addition, test-parse-v2.py is an example use of the class to parse some contract files.  
+If you can't wait, the class methods are already commented in the file. These comments explain most of what you would need to use it. In addition, test-parse-v2.py is an example use of the class to parse some contract files.  
 
 
 ### Original Hackathon Submission Code
 
-The original project code is located in test-parse.py. This code wasn't written with re-use in mind and includes numerous examples of bad some ugly coding practices. The newer code (see test-parse-v2.py and contract.py) uses nearly the same logic and parsing rules as the original hackathon submission but was rewritten as a Python class. This newer version is much easier to use and includes some extras, such as providing some basic NLP statistics about the text.
+The original project code is located in test-parse.py. This code wasn't written with re-use in mind and includes numerous examples of some ugly coding practices, such as duplicate logic and many poorly named vars. The rewritten version (as a Python class) will start by using nearly the same logic and rules as the original hackathon submission but was rewritten as a Python class with the expectation that it will be improved and expanded. This newer version is already much easier to use and includes some extras, such as providing some basic NLP statistics about the text. The original hackathon submission code will remain, as is, in test-parse.py. 
 
 Using the original code requires you to have NLTK 3 already installed. After you have NLTK installed, it can be used as follows:
 
-To test the code against some documents, edit the below call to parseSamples() function (which is located at the end of the test-parse.py file). The function takes two params (1) a string which is the path where your contract documents are located, and (2) a int which is the limit on the number of documents to scan. In the example below, the code will return results for the first 170 documents it encounters in any folder or subfolders it encounters at the path provided.         
+To test the code against sample documents, edit the below call to parseSamples() function (which is located at the end of the test-parse.py file). The function takes two params (1) a string which is the path where your contract documents are located, and (2) a int which is the limit on the number of documents to scan. In the example below, the code will return results for the first 170 documents it encounters in any folder or subfolders it encounters at the path provided.         
 
 ```
 parseSamples('samples/2014/QTR1', 170)
