@@ -12,7 +12,7 @@ class Contract():
     def __init__(self, path, filename, text):
         """ Inits a Contract object, and triggers tokenize(). 
     
-        Args:
+        2 Args:
         path = a string of the path to the contract
         filename = a string of the contract's filename
         """
@@ -31,8 +31,8 @@ class Contract():
 
         No Args
         
-        Sets Class Vars:
-        tokens = the obj as a list of tokens
+        Sets 4 Class Vars:
+        tokens = the text as a list of tokens
         token_count = an int of number of tokens in contract
         unique_tokens = a list of distinct tokens in contract, sorted
         unique_token_count = an int of number of unique tokens 
@@ -49,7 +49,8 @@ class Contract():
 
         No Args
 
-        Sets Class Vars:
+        Sets 3 Class Vars:
+        setences = the text as a list of setence segments
         sent_count = number of sentences
         avg_sent_length = char count divided by num of sentences 
         """
@@ -58,109 +59,67 @@ class Contract():
         self.avg_sent_length = self.char_count / self.sent_count
 
 
-    def find_token(self,token):
-        """ Returns an int of index where token first occurred, or -1 if not
-        found in text. 
-
-        Args:
-        token = a string of the token to find
-        """
-        try: 
-            idx = self.tokens.index(token)
-        except:
-            idx = -1
-        return idx
-
-
-    def find_words_by_length(self,word_length):
-        """ Returns a set of words of a given length, sorted by frequency
-        
-        Args:
-        word_length = an int of word length to target
-        """
-        word_set = set(self.tokens)
-        return_set = []
-        for word in word_set:
-            if len(word) == word_length:
-                return_set.append(word)
-        return return_set
-
-
     def extract_parties(self):
-        """ [comment]
+        """ Parses text and extracts specific strings which appear to be names 
+        of parties to the contract, according to a set of predefined rules.
+
+        No Args
+
+        Sets 6 Class Vars:
+        parties = a list of extracted parties.
+        parties_rule[x]_count = a int count of the number of instances in which 
+        a particular rule was used to id a party.
+
         """
         self.parties = []
+        self.parties_rule1_count = 0
+        self.parties_rule2_count = 0
+        self.parties_rule3_count = 0
+        self.parties_rule4_count = 0
+        self.parties_rule5_count = 0
         for idx, val in enumerate(self.tokens):
             depth = (float(idx+1) / self.token_count) * float(100)
-            # print "\r\t {}".format(depth),
-
-            """
-            ORIGINAL RULE #1
-            within the first 10 pct of text, assume a 3-token string that looks 
-            like a name with a middle initial is a party to the contract. 
-            """
+            # ORIGINAL RULE #1
             if depth < 10:
                 if self.like_person_name(idx):
                     name = " ".join(self.tokens[idx:idx+3])
+                    self.parties_rule1_count += 1
                     self.add_party(name)
-
-            """
-            ORIGINAL RULE #2
-            within first 10 pct of text, assume phrases with full or initial  
-            capitalization immediately following the words "among" or "between"
-            are parties to the contract.   
-            """
+            # ORIGINAL RULE #2
             if depth < 10:
                 triggers = ["among","between"]
-                if self.prior_phrase(idx,triggers) and self.like_org_name(idx):
+                if self.prior(idx,triggers) and self.like_org_name(idx):
                     name = self.capture_org_name(idx,"right")
+                    self.parties_rule2_count += 1
                     self.add_party(name)
-
-            """
-            ORIGINAL RULE #3
-            within first 10 pct of text, assume phrases with full or initial 
-            capitalization before the phrase "(Exact name of registrant ..."
-            is a party to the contract. Designed for language on certain SEC 
-            filings.  
-            """
+            # ORIGINAL RULE #3
             if depth < 10:
                 triggers = ["( Exact name of"]
-                if self.prior_phrase(idx,triggers) and self.tokens[idx] == "registrant" and self.like_org_name(idx-5):
+                if self.prior(idx,triggers) and self.tokens[idx] == "registrant" and self.like_org_name(idx-5):
                     name = self.capture_org_name(idx-5,"left")
+                    self.parties_rule3_count += 1
                     self.add_party(name)
-
-
-    def clean_name(self,name):
-        # add this
-        return name
-
-
-    def add_party(self,name):
-        name = self.clean_name(name)
-        if name.upper() not in (party.upper() for party in self.parties):       
-            self.parties.append(name)
-
-
-    def prior_phrase(self,idx,triggers):
-        for phrase in triggers:
-            phrase_tokens = nltk.word_tokenize(phrase)
-            i = 1
-            pre_words = []
-            while i <= len(phrase_tokens):
-                pre_words.insert(0,self.tokens[idx-i])
-                i += 1
-            if phrase_tokens == pre_words:
-                return True
-            else:
-                return False      
-
-
-    def like_org_name(self,idx):
-        w = self.tokens[idx]
-        if w.isupper() or w.istitle():
-            return True
-        else:
-            return False
+            # ORIGINAL RULE #4
+            if depth < 10:
+                triggers = ["( The"]
+                if self.prior(idx,triggers) and self.tokens[idx] == "Company" and self.subsequent(idx,[')'],1) and self.like_org_name(idx-3):
+                    name = self.capture_org_name(idx-3,"left")
+                    self.parties_rule4_count += 1                    
+                    self.add_party(name)
+            # ORIGINAL RULE #5
+            if depth < 10:
+                triggers = ["( The","( the","("]
+                defined_terms = ["Company","Buyer","Seller","Sellers","Purchaser","Parent","Guarantor","Lender","Borrower","Lessor","Lessee","Landlord","Tenant","Creditor","Contractor","Customer","Indemnitee","Employer","Employee","Bank","Trustee","Supplier","Licensee","Licensor","Investor","Debtor"]
+                incorp_3 = ["a Delaware corporation","a Kansas corporation","an Arizona corporation","an Illinois corporation","a California corporation"]
+                if self.prior(idx,triggers) and self.tokens[idx] in defined_terms:
+                    if self.prior(idx-2,incorp_3):
+                        name = self.capture_org_name(idx-5,"left")
+                        self.parties_rule5_count += 1                    
+                        self.add_party(name)
+                    elif self.like_org_name(idx-3):
+                        name = self.capture_org_name(idx-3,"left")
+                        self.parties_rule5_count += 1                    
+                        self.add_party(name)
 
 
     def capture_org_name(self,idx,direction):
@@ -208,6 +167,14 @@ class Contract():
             return name
 
 
+    def like_org_name(self,idx):
+        w = self.tokens[idx]
+        if w.isupper() or w.istitle():
+            return True
+        else:
+            return False
+
+
     def like_person_name(self,idx):
         bad_names = ["Art.","Art","Article","Sec.","Sect.","Section","Sec","Part"]
         w = self.tokens[idx:idx+3]
@@ -224,10 +191,87 @@ class Contract():
             return False
 
 
-    def get_token_in_context(self, idx, reach = 1):
+    def prior(self,idx,triggers):
+        for phrase in triggers:
+            phrase_tokens = nltk.word_tokenize(phrase)
+            i = 1
+            pre_words = []
+            while i <= len(phrase_tokens):
+                pre_words.insert(0,self.tokens[idx-i])
+                i += 1
+            if phrase_tokens == pre_words:
+                return True
+            else:
+                return False      
+
+
+    def subsequent(self,idx,triggers,reach):
+        for phrase in triggers:
+            phrase_tokens = nltk.word_tokenize(phrase)
+            offset = 0
+            while offset <= reach:
+                i = 1
+                post_words = []
+                while i <= len(phrase_tokens):
+                    x = i + offset
+                    post_words.append(self.tokens[idx+x])
+                    i += 1
+                if phrase_tokens == post_words:
+                    return True
+                else:
+                    offset += 1         
+
+
+    def add_party(self,name):
+        name = self.get_cleaned_name(name)
+        if name.upper() not in (party.upper() for party in self.parties):       
+            self.parties.append(name)
+
+
+    def get_token(self,token):
+        """ Returns an int of index where token first occurred, or -1 if not
+        found in text. 
+
+        1 Arg:
+        token = a string of the token to find
+        """
+        try: 
+            idx = self.tokens.index(token)
+        except:
+            idx = -1
+        return idx
+
+
+    def get_words_by_length(self,word_length):
+        """ Returns a set of words of a given length, sorted by frequency
+        
+        1 Arg:
+        word_length = an int of word length to target
+        """
+        word_set = set(self.tokens)
+        return_set = []
+        for word in word_set:
+            if len(word) == word_length:
+                return_set.append(word)
+        return return_set
+
+
+    def get_cleaned_name(self,name):
+        """ Returns a string with certain special characters removed which may 
+        have been extracted with a name.
+
+        1 Arg:
+        name = a string representing a contract party (either a person or an 
+        organization).
+        """
+        # add this
+        return name
+
+
+    def get_token_in_context(self,idx,reach = 1):
         """ Returns a list containing a token, with surrounding tokens.
 
-        Arg:
+        2 Args:
         idx = an int of the target token
         reach = an int of the number of tokens on each side of token to return 
         """
@@ -242,6 +286,9 @@ class Contract():
         else:
             return []
 
+
+    def get_parties_rule_counts(self):
+        return [parties_rule1_count, parties_rule2_count, parties_rule3_count, parties_rule4_count, parties_rule5_count]
 
     def output_filename_header(self, num = -1):
         """ Outputs a basic header with path and filename to the command line.
@@ -330,6 +377,19 @@ class Contract():
         """ 
         str_parties = '; '.join(self.parties)
         print "\t PARTIES: " + str_parties
+
+
+    def output_parties_rule_data(self):
+        """ Output data on individual parsing rule hits
+
+        No Args
+        """
+        print "\t R1: {0:,g}".format(self.parties_rule1_count)
+        print "\t R2: {0:,g}".format(self.parties_rule2_count)
+        print "\t R3: {0:,g}".format(self.parties_rule3_count)
+        print "\t R4: {0:,g}".format(self.parties_rule4_count)
+        print "\t R5: {0:,g}".format(self.parties_rule5_count)
+
 
     def test(self):
         x = nltk.FreqDist(self.tokens)
