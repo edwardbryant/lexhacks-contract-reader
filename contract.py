@@ -123,6 +123,15 @@ class Contract():
 
 
     def capture_org_name(self,idx,direction):
+        """ Assemble a string which represents an organization's name. After an 
+        a rule in extract_parties is triggered, capture_org_name trys to gather 
+        all the words in the name together as a single string which it returns.   
+
+        2 Args:
+        idx = an int of the index location where to start parsing for the name.
+        direction = a string (right/left) indicating the direction in which 
+        to parse for a name. 
+        """
         punc = [","]
         frag = ["Inc.","INC.","Incorp.","INCORP.","LLC","N.A.","L.L.C.","LP","L.P.","B.V.","BV","N.V.","NV","Corp.","CORP."]
         name = self.tokens[idx]
@@ -168,6 +177,12 @@ class Contract():
 
 
     def like_org_name(self,idx):
+        """ Checks a word token and returns boolean value on whether the token 
+        appears to be the proper name of an organization.
+
+        1 Arg:
+        idx = an int of the index location of the token to check. 
+        """
         w = self.tokens[idx]
         if w.isupper() or w.istitle():
             return True
@@ -176,6 +191,14 @@ class Contract():
 
 
     def like_person_name(self,idx):
+        """ Checks a word token and returns boolean value on whether the token 
+        (and its subsequent 2 tokens) appear to be a person's name fitting the 
+        pattern of "Firstname M. Lastname" making it likely to be a person's 
+        name.
+
+        1 Arg:
+        idx = an int of the index location of the token to check.
+        """
         bad_names = ["Art.","Art","Article","Sec.","Sect.","Section","Sec","Part"]
         w = self.tokens[idx:idx+3]
         if w[0].istitle() or w[0].isupper():
@@ -192,6 +215,13 @@ class Contract():
 
 
     def prior(self,idx,triggers):
+        """ Checks the tokens preceding a token for whether a string occurs 
+        prior to it and returns a boolean.
+
+        2 Args:
+        idx = an int of the index location of the token to look before.
+        triggers = a list of strings with any words or phrases to look for. 
+        """
         for phrase in triggers:
             phrase_tokens = nltk.word_tokenize(phrase)
             i = 1
@@ -206,6 +236,14 @@ class Contract():
 
 
     def subsequent(self,idx,triggers,reach):
+        """ Checks the tokens after a token for whether a string occurs 
+        within a given range of tokens and returns a boolean.
+
+        3 Args:
+        idx = an int of the index location of the token to look after.
+        triggers = a list of strings with any words or phrases to look for. 
+        reach = an int representing how many tokens forward to look.
+        """        
         for phrase in triggers:
             phrase_tokens = nltk.word_tokenize(phrase)
             offset = 0
