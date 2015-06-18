@@ -109,8 +109,16 @@ class Contract():
             # ORIGINAL RULE #5
             if depth < 10:
                 triggers = ["( The","( the","("]
-                defined_terms = ["Company","Buyer","Seller","Sellers","Purchaser","Parent","Guarantor","Lender","Borrower","Lessor","Lessee","Landlord","Tenant","Creditor","Contractor","Customer","Indemnitee","Employer","Employee","Bank","Trustee","Supplier","Licensee","Licensor","Investor","Debtor"]
-                incorp_3 = ["a Delaware corporation","a Kansas corporation","an Arizona corporation","an Illinois corporation","a California corporation"]
+                defined_terms = ["Company", "Buyer", "Seller", "Sellers", 
+                                 "Purchaser", "Parent", "Guarantor", "Lender", 
+                                 "Borrower", "Lessor", "Lessee", "Landlord", 
+                                 "Tenant", "Creditor", "Contractor", "Customer",
+                                 "Indemnitee", "Employer", "Employee", "Bank",
+                                 "Trustee", "Supplier", "Licensee", "Licensor",
+                                 "Investor", "Debtor"]
+                incorp_3 = ["a Delaware corporation", "a Kansas corporation", 
+                            "an Arizona corporation", "an Illinois corporation",
+                            "a California corporation"]
                 if self.prior(idx,triggers) and self.tokens[idx] in defined_terms:
                     if self.prior(idx-2,incorp_3):
                         name = self.capture_org_name(idx-5,"left")
@@ -133,7 +141,8 @@ class Contract():
         to parse for a name. 
         """
         punc = [","]
-        frag = ["Inc.","INC.","Incorp.","INCORP.","LLC","N.A.","L.L.C.","LP","L.P.","B.V.","BV","N.V.","NV","Corp.","CORP."]
+        frag = ["Inc.", "INC.", "Incorp.", "INCORP.", "LLC", "N.A.", "L.L.C.", 
+                "LP", "L.P.", "B.V.", "BV", "N.V.", "NV", "Corp.", "CORP."]
         name = self.tokens[idx]
         cap = "none"
         if self.tokens[idx].istitle():
@@ -199,7 +208,8 @@ class Contract():
         1 Arg:
         idx = an int of the index location of the token to check.
         """
-        bad_names = ["Art.","Art","Article","Sec.","Sect.","Section","Sec","Part"]
+        bad_names = ["Art.", "Art", "Article", "Sec.", "Sect.", "Section", 
+                     "Sec", "Part"]
         w = self.tokens[idx:idx+3]
         if w[0].istitle() or w[0].isupper():
             next_len = len(w[1])
@@ -261,6 +271,12 @@ class Contract():
 
 
     def add_party(self,name):
+        """ Takes a party name and adds it to the class var parties, after 
+        cleaning it and ensuring against duplicates.
+
+        1 Arg:
+        name = a string of the party name to add.  
+        """
         name = self.get_cleaned_name(name)
         if name.upper() not in (party.upper() for party in self.parties):       
             self.parties.append(name)
@@ -326,7 +342,8 @@ class Contract():
 
 
     def get_parties_rule_counts(self):
-        return [parties_rule1_count, parties_rule2_count, parties_rule3_count, parties_rule4_count, parties_rule5_count]
+        return [parties_rule1_count, parties_rule2_count, parties_rule3_count, 
+                parties_rule4_count, parties_rule5_count]
 
     def output_filename_header(self, num = -1):
         """ Outputs a basic header with path and filename to the command line.
@@ -430,6 +447,8 @@ class Contract():
 
 
     def test(self):
+        """ Ignore me.
+        """
         x = nltk.FreqDist(self.tokens)
         return nltk.x.most_common(10)
         # print "X: " + str(x)

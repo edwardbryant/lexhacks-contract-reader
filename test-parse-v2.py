@@ -19,7 +19,7 @@ def parseSamples(path, limit):
                 if num < limit:
                     k = contract.Contract(dirpath, filename, text)
                     k.output_filename_header(num)
-                    # k.output_basic_stats()
+                    k.output_basic_stats()
 
                     k.extract_parties()
                     k.output_parties()
